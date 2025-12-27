@@ -30,7 +30,7 @@ dockerComposeVersion="v2.5.0"
 
 labcaUrl="https://github.com/hakwerk/labca/"
 boulderUrl="https://github.com/letsencrypt/boulder/"
-boulderTag="v0.20251110.0"
+boulderTag="v0.20251216.0"
 
 #
 # Color configuration
@@ -716,6 +716,8 @@ cleanup() {
     rm -f $adminDir/templates/register.tmpl
     rm -f $adminDir/templates/setup.tmpl
     rm -f $adminDir/templates/wrapup.tmpl
+    rm -f $boulderLabCADir/akamai-test-srv/main.go
+    rm -f $boulderLabCADir/block-a-key/main.go
 
     # Remove host nginx if installed, as we are now using the docker container
     systemctl stop nginx &>>$installLog || true

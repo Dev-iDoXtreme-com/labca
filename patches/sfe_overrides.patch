@@ -1,5 +1,5 @@
 diff --git a/sfe/overrides.go b/sfe/overrides.go
-index e313f27b7..28b024373 100644
+index fd7589e60..abbbb8e1b 100644
 --- a/sfe/overrides.go
 +++ b/sfe/overrides.go
 @@ -15,6 +15,7 @@ import (
@@ -10,7 +10,7 @@ index e313f27b7..28b024373 100644
  	"github.com/letsencrypt/boulder/policy"
  	rl "github.com/letsencrypt/boulder/ratelimits"
  	"github.com/letsencrypt/boulder/sfe/forms"
-@@ -346,7 +347,11 @@ func validateOverrideRequestField(fieldName, fieldValue, rateLimit string) error
+@@ -347,7 +348,11 @@ func validateOverrideRequestField(fieldName, fieldValue, rateLimit string) error
  		return nil
  
  	case emailAddressFieldName:
@@ -23,7 +23,7 @@ index e313f27b7..28b024373 100644
  		if err == nil {
  			return nil
  		}
-@@ -372,7 +377,11 @@ func validateOverrideRequestField(fieldName, fieldValue, rateLimit string) error
+@@ -373,7 +378,11 @@ func validateOverrideRequestField(fieldName, fieldValue, rateLimit string) error
  		return fmt.Errorf("IP address is invalid")
  
  	case RegisteredDomainFieldName:

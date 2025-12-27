@@ -682,7 +682,7 @@ func CollectDashboardData(w http.ResponseWriter, r *http.Request) (map[string]in
 		dashboardData["NumCerts"] = numcerts
 		dashboardData["NumExpired"] = numexpired
 	} else {
-		rows, err = db.Query("SELECT count(*) FROM certificateStatus WHERE revokedDate='0000-00-00 00:00:00' AND notAfter >= NOW()")
+		rows, err = db.Query("SELECT count(*) FROM certificateStatus WHERE (revokedDate='0000-00-00 00:00:00' OR revokedDate='2000-01-01 00:00:00') AND notAfter >= NOW()")
 		if err != nil {
 			errorHandler(w, r, err, http.StatusInternalServerError)
 			return nil, err
@@ -718,7 +718,7 @@ func CollectDashboardData(w http.ResponseWriter, r *http.Request) (map[string]in
 	if viper.GetString("backend") == "step-ca" {
 		rows, err = db.Query("SELECT count(*) FROM revoked_x509_certs")
 	} else {
-		rows, err = db.Query("SELECT count(*) FROM certificateStatus WHERE revokedDate<>'0000-00-00 00:00:00'")
+		rows, err = db.Query("SELECT count(*) FROM certificateStatus WHERE revokedDate<>'0000-00-00 00:00:00' AND revokedDate<>'2000-01-01 00:00:00'")
 	}
 	if err != nil {
 		errorHandler(w, r, err, http.StatusInternalServerError)

@@ -1,8 +1,8 @@
 diff --git a/va/http.go b/va/http.go
-index e7b0ec304..2b2aa2210 100644
+index dd9f0a998..8af8d1fe8 100644
 --- a/va/http.go
 +++ b/va/http.go
-@@ -350,7 +350,16 @@ func (va *ValidationAuthorityImpl) extractRequestTarget(req *http.Request) (iden
+@@ -349,7 +349,16 @@ func (va *ValidationAuthorityImpl) extractRequestTarget(req *http.Request) (iden
  	}
  
  	if _, err := iana.ExtractSuffix(reqHost); err != nil {
@@ -20,7 +20,7 @@ index e7b0ec304..2b2aa2210 100644
  	}
  
  	return identifier.NewDNS(reqHost), reqPort, nil
-@@ -398,10 +407,10 @@ func (va *ValidationAuthorityImpl) setupHTTPValidation(
+@@ -397,10 +406,10 @@ func (va *ValidationAuthorityImpl) setupHTTPValidation(
  
  	// This is a backstop check to avoid connecting to reserved IP addresses.
  	// They should have been caught and excluded by `bdns.LookupHost`.

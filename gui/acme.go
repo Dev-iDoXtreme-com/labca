@@ -1200,11 +1200,11 @@ func GetCertificates(w http.ResponseWriter, r *http.Request, forAccount string) 
 	} else {
 		where := ""
 		if r.URL.Query().Get("active") != "" {
-			where = " WHERE cs.revokedDate='0000-00-00 00:00:00' AND cs.notAfter >= NOW()"
+			where = " WHERE (cs.revokedDate='0000-00-00 00:00:00' OR cs.revokedDate='2000-01-01 00:00:00') AND cs.notAfter >= NOW()"
 		} else if r.URL.Query().Get("expired") != "" {
 			where = " WHERE cs.notAfter < NOW()"
 		} else if r.URL.Query().Get("revoked") != "" {
-			where = " WHERE cs.revokedDate<>'0000-00-00 00:00:00'"
+			where = " WHERE cs.revokedDate<>'0000-00-00 00:00:00' AND cs.revokedDate<>'2000-01-01 00:00:00'"
 		}
 
 		if forAccount == "" {
@@ -1269,7 +1269,7 @@ func getReasonText(RevokedReason int, Revoked string) string {
 	reasonText := ""
 	switch RevokedReason {
 	case 0:
-		if Revoked != "0000-00-00 00:00:00" {
+		if Revoked != "0000-00-00 00:00:00" && Revoked != "2000-01-01 00:00:00" {
 			reasonText = " - Unspecified"
 		}
 	case 1:
@@ -1487,7 +1487,7 @@ func GetCertificate(w http.ResponseWriter, r *http.Request, id string, serial st
 			Link := NameValue{"Account", template.HTML("<a href=\"" + r.Header.Get("X-Request-Base") + "/accounts/" + strconv.Itoa(certificate.RegistrationID) + "\">" + strconv.Itoa(certificate.RegistrationID) + "</a>")}
 			CertificateDetails.Rows = append(CertificateDetails.Rows, Link)
 
-			if certificate.Revoked == "0000-00-00 00:00:00" {
+			if certificate.Revoked == "0000-00-00 00:00:00" || certificate.Revoked == "2000-01-01 00:00:00" {
 				revokeHTML, err := tmpls.RenderSingle("views/revoke-partial.tmpl", struct{ Serial string }{Serial: certificate.Serial})
 				if err != nil {
 					errorHandler(w, r, err, http.StatusInternalServerError)

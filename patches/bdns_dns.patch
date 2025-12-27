@@ -1,46 +1,46 @@
 diff --git a/bdns/dns.go b/bdns/dns.go
-index 5fee207b8..f147da8e9 100644
+index ea91a5c43..b6f5c1eba 100644
 --- a/bdns/dns.go
 +++ b/bdns/dns.go
-@@ -20,6 +20,7 @@ import (
+@@ -17,6 +17,7 @@ import (
  	"github.com/prometheus/client_golang/prometheus"
  	"github.com/prometheus/client_golang/prometheus/promauto"
  
 +	"github.com/letsencrypt/boulder/features"
- 	"github.com/letsencrypt/boulder/iana"
  	blog "github.com/letsencrypt/boulder/log"
  	"github.com/letsencrypt/boulder/metrics"
-@@ -75,22 +76,30 @@ func New(
+ )
+@@ -89,21 +90,31 @@ func New(
+ 	log blog.Logger,
+ 	tlsConfig *tls.Config,
  ) Client {
- 	var client exchanger
- 
--	// Clone the default transport because it comes with various settings
--	// that we like, which are different from the zero value of an
--	// `http.Transport`.
+-	// Clone the default transport because it comes with various settings that we
+-	// like, which are different from the zero value of an `http.Transport`. Then
+-	// set it to force HTTP/2, because Unbound will reject non-HTTP/2 DoH
+-	// requests.
 -	transport := http.DefaultTransport.(*http.Transport).Clone()
 -	transport.TLSClientConfig = tlsConfig
--	// The default transport already sets this field, but it isn't
--	// documented that it will always be set. Set it again to be sure,
--	// because Unbound will reject non-HTTP/2 DoH requests.
 -	transport.ForceAttemptHTTP2 = true
--	client = &dohExchanger{
+-
+-	exchanger := &dohExchanger{
 -		clk: clk,
 -		hc: http.Client{
 -			Timeout:   readTimeout,
 -			Transport: transport,
 -		},
 -		userAgent: userAgent,
++	var exchanger exchanger
++
 +	if features.Get().DOH {
-+		// Clone the default transport because it comes with various settings
-+		// that we like, which are different from the zero value of an
-+		// `http.Transport`.
++		// Clone the default transport because it comes with various settings that we
++		// like, which are different from the zero value of an `http.Transport`. Then
++		// set it to force HTTP/2, because Unbound will reject non-HTTP/2 DoH
++		// requests.
 +		transport := http.DefaultTransport.(*http.Transport).Clone()
 +		transport.TLSClientConfig = tlsConfig
-+		// The default transport already sets this field, but it isn't
-+		// documented that it will always be set. Set it again to be sure,
-+		// because Unbound will reject non-HTTP/2 DoH requests.
 +		transport.ForceAttemptHTTP2 = true
-+		client = &dohExchanger{
++
++		exchanger = &dohExchanger{
 +			clk: clk,
 +			hc: http.Client{
 +				Timeout:   readTimeout,
@@ -49,7 +49,7 @@ index 5fee207b8..f147da8e9 100644
 +			userAgent: userAgent,
 +		}
 +	} else {
-+		client = &dns.Client{
++		exchanger = &dns.Client{
 +			// Set timeout for underlying net.Conn
 +			ReadTimeout: readTimeout,
 +			Net:         "udp",
@@ -57,25 +57,20 @@ index 5fee207b8..f147da8e9 100644
  	}
  
  	queryTime := promauto.With(stats).NewHistogramVec(
-@@ -260,10 +269,17 @@ func (dnsClient *impl) exchangeOne(ctx context.Context, hostname string, qtype u
- 		case r := <-ch:
- 			if r.err != nil {
- 				var isRetryable bool
--				// Check if the error is a timeout error. Network errors
--				// that can timeout implement the net.Error interface.
--				var netErr net.Error
--				isRetryable = errors.As(r.err, &netErr) && netErr.Timeout()
-+				if features.Get().DOH {
-+					// Check if the error is a timeout error. Network errors
-+					// that can timeout implement the net.Error interface.
-+					var netErr net.Error
-+					isRetryable = errors.As(r.err, &netErr) && netErr.Timeout()
-+				} else {
-+					// According to the net package documentation, retryable
-+					// errors emitted by the net package are of type *net.OpError.
-+					var opErr *net.OpError
-+					isRetryable = errors.As(r.err, &opErr) && opErr.Temporary()
-+				}
- 				hasRetriesLeft := tries < dnsClient.maxTries
- 				if isRetryable && hasRetriesLeft {
- 					tries++
+@@ -230,8 +241,14 @@ func (c *impl) exchangeOne(ctx context.Context, hostname string, qtype uint16) (
+ 
+ 			// Check if the error is a network timeout, rather than a local context
+ 			// timeout. If it is, retry instead of giving up.
+-			var netErr net.Error
+-			isRetryable := ctx.Err() == nil && errors.As(err, &netErr) && netErr.Timeout()
++			var isRetryable bool
++			if features.Get().DOH {
++				var netErr net.Error
++				isRetryable = ctx.Err() == nil && errors.As(err, &netErr) && netErr.Timeout()
++			} else {
++				var opErr *net.OpError
++				isRetryable = ctx.Err() == nil && errors.As(err, &opErr) && opErr.Temporary()
++			}
+ 			hasRetriesLeft := tries < c.maxTries
+ 			if isRetryable && hasRetriesLeft {
+ 				continue

@@ -1,8 +1,8 @@
 diff --git a/ca/ca.go b/ca/ca.go
-index 3a62648c3..2cb8337ca 100644
+index 713a38eb9..cc066ad49 100644
 --- a/ca/ca.go
 +++ b/ca/ca.go
-@@ -190,11 +190,12 @@ func NewCertificateAuthorityImpl(
+@@ -182,11 +182,12 @@ func NewCertificateAuthorityImpl(
  		}
  	}
  
@@ -20,7 +20,7 @@ index 3a62648c3..2cb8337ca 100644
  
  	return &certificateAuthorityImpl{
  		sa:        sa,
-@@ -474,9 +475,10 @@ func (ca *certificateAuthorityImpl) pickIssuer(profileName string, keyAlg x509.P
+@@ -466,9 +467,10 @@ func (ca *certificateAuthorityImpl) pickIssuer(profileName string, keyAlg x509.P
  		if !issuer.IsActive() {
  			continue
  		}

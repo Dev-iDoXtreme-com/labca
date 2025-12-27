@@ -1,5 +1,5 @@
 diff --git a/cmd/boulder-va/main.go b/cmd/boulder-va/main.go
-index fecf2ed7f..aa4d3320a 100644
+index ab196c2ff..b364a744f 100644
 --- a/cmd/boulder-va/main.go
 +++ b/cmd/boulder-va/main.go
 @@ -58,6 +58,7 @@ type Config struct {
@@ -28,11 +28,11 @@ index fecf2ed7f..aa4d3320a 100644
  		cmd.FailOnError(err, "Couldn't start dynamic DNS server resolver")
  	}
  	defer servers.Stop()
-@@ -154,6 +159,7 @@ func main() {
+@@ -142,6 +147,7 @@ func main() {
  		va.PrimaryPerspective,
  		"",
  		iana.IsReservedAddr,
 +		c.VA.LabCADomains,
  		c.VA.SlowRemoteTimeout.Duration,
+ 		c.VA.DNSAllowLoopbackAddresses,
  	)
- 	cmd.FailOnError(err, "Unable to create VA server")

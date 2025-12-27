@@ -1,13 +1,13 @@
 diff --git a/test/config/ra.json b/test/config/ra.json
-index b2dcd15eb..3e8d5af59 100644
+index c74e12e77..8343e3ddc 100644
 --- a/test/config/ra.json
 +++ b/test/config/ra.json
 @@ -3,7 +3,8 @@
  		"limiter": {
  			"redis": {
- 				"username": "boulder-wfe",
--				"passwordFile": "test/secrets/wfe_ratelimits_redis_password",
-+				"passwordFile": "labca/secrets/wfe_ratelimits_redis_password",
+ 				"username": "boulder",
+-				"passwordFile": "test/secrets/redis_password",
++				"passwordFile": "labca/secrets/redis_password",
 +				"db": 1,
  				"lookups": [
  					{
@@ -24,10 +24,10 @@ index b2dcd15eb..3e8d5af59 100644
 +					"keyFile": "labca/certs/ipki/wfe.boulder/key.pem"
  				}
  			},
--			"Defaults": "test/config/wfe2-ratelimit-defaults.yml",
--			"Overrides": "test/config/wfe2-ratelimit-overrides.yml"
-+			"Defaults": "labca/config/wfe2-ratelimit-defaults.yml",
-+			"Overrides": "labca/config/wfe2-ratelimit-overrides.yml"
+-			"Defaults": "test/config/ratelimit-defaults.yml",
+-			"Overrides": "test/config/ratelimit-overrides.yml"
++			"Defaults": "labca/config/ratelimit-defaults.yml",
++			"Overrides": "labca/config/ratelimit-overrides.yml"
  		},
  		"maxContactsPerRegistration": 3,
  		"debugAddr": ":8002",

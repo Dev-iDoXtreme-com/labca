@@ -1,8 +1,8 @@
 diff --git a/cmd/cert-checker/main.go b/cmd/cert-checker/main.go
-index a323e70b8..df64d3e94 100644
+index 5e8790d20..c7aa8a713 100644
 --- a/cmd/cert-checker/main.go
 +++ b/cmd/cert-checker/main.go
-@@ -109,6 +109,7 @@ type certChecker struct {
+@@ -110,6 +110,7 @@ type certChecker struct {
  	acceptableValidityDurations map[time.Duration]bool
  	lints                       lint.Registry
  	logger                      blog.Logger
@@ -10,7 +10,7 @@ index a323e70b8..df64d3e94 100644
  }
  
  func newChecker(saDbMap certDB,
-@@ -119,6 +120,7 @@ func newChecker(saDbMap certDB,
+@@ -120,6 +121,7 @@ func newChecker(saDbMap certDB,
  	avd map[time.Duration]bool,
  	lints lint.Registry,
  	logger blog.Logger,
@@ -18,7 +18,7 @@ index a323e70b8..df64d3e94 100644
  ) certChecker {
  	precertGetter := func(ctx context.Context, serial string) ([]byte, error) {
  		precertPb, err := sa.SelectPrecertificate(ctx, saDbMap, serial)
-@@ -140,6 +142,7 @@ func newChecker(saDbMap certDB,
+@@ -141,6 +143,7 @@ func newChecker(saDbMap certDB,
  		acceptableValidityDurations: avd,
  		lints:                       lints,
  		logger:                      logger,
@@ -26,7 +26,7 @@ index a323e70b8..df64d3e94 100644
  	}
  }
  
-@@ -437,14 +440,16 @@ func (c *certChecker) checkCert(ctx context.Context, cert *corepb.Certificate) (
+@@ -438,14 +441,16 @@ func (c *certChecker) checkCert(ctx context.Context, cert *corepb.Certificate) (
  			problems = append(problems, fmt.Sprintf("Policy Authority isn't willing to issue for '%s': %s", name, err))
  			continue
  		}
@@ -51,7 +51,7 @@ index a323e70b8..df64d3e94 100644
  		}
  	}
  	for _, name := range parsedCert.IPAddresses {
-@@ -533,9 +538,10 @@ type Config struct {
+@@ -534,9 +539,10 @@ type Config struct {
  
  		Workers int `validate:"required,min=1"`
  		// Deprecated: this is ignored, and cert checker always checks both expired and unexpired.
@@ -65,7 +65,7 @@ index a323e70b8..df64d3e94 100644
  
  		// AcceptableValidityDurations is a list of durations which are
  		// acceptable for certificates we issue.
-@@ -593,6 +599,8 @@ func main() {
+@@ -599,6 +605,8 @@ func main() {
  		acceptableValidityDurations[ninetyDays] = true
  	}
  
@@ -74,7 +74,7 @@ index a323e70b8..df64d3e94 100644
  	// Validate PA config and set defaults if needed.
  	cmd.FailOnError(config.PA.CheckChallenges(), "Invalid PA configuration")
  	cmd.FailOnError(config.PA.CheckIdentifiers(), "Invalid PA configuration")
-@@ -637,6 +645,7 @@ func main() {
+@@ -642,6 +650,7 @@ func main() {
  		acceptableValidityDurations,
  		lints,
  		logger,

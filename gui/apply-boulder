@@ -126,9 +126,9 @@ if [ "$PKI_DOMAIN_MODE" == "lockdown" ] || [ "$PKI_DOMAIN_MODE" == "whitelist" ]
     cat rate-limit-policies.yml | tr '\n' '\r' | sed -e "s/\(must-staple.le.wtf: 10000\).*\(  registrationOverrides:\)/\1\n$REPLACEMENT\2/" | tr '\r' '\n' > rate-limit-policies.yml.bak && mv rate-limit-policies.yml.bak rate-limit-policies.yml
     cat rate-limit-policies.yml | tr '\n' '\r' | sed -e "s|\(certificatesPerFQDNSet:.*must-staple.le.wtf: 10000\).*\(certificatesPerFQDNSetFast:.*\)|\1\n${REPLACEMENT}rateLimitsURL: http://$PKI_FQDN/rate-limits\n\2|" | tr '\r' '\n' > rate-limit-policies.yml.bak && mv rate-limit-policies.yml.bak rate-limit-policies.yml
 
-    cat config/wfe2-ratelimit-overrides.yml | tr '\n' '\r' | sed -e "s/\(- CertificatesPerDomain:.*ratelimit.me.*\)\(- CertificatesPerDomain:\)/\2/" | tr '\r' '\n' > config/wfe2-ratelimit-overrides.yml.bak && mv config/wfe2-ratelimit-overrides.yml.bak config/wfe2-ratelimit-overrides.yml
-    cat config/wfe2-ratelimit-overrides.yml | tr '\n' '\r' | sed -e "s/\(- CertificatesPerDomain:.*ids:\)\(.*\)\(- CertificatesPerFQDNSet:\)/\1\r$REPLACEMENT2\3/" | tr '\r' '\n' > config/wfe2-ratelimit-overrides.yml.bak && mv config/wfe2-ratelimit-overrides.yml.bak config/wfe2-ratelimit-overrides.yml
-    cat config/wfe2-ratelimit-overrides.yml | tr '\n' '\r' | sed -e "s/\(- CertificatesPerFQDNSet:.*ids:\)\(.*\)/\1\r$REPLACEMENT2/" | tr '\r' '\n' > config/wfe2-ratelimit-overrides.yml.bak && mv config/wfe2-ratelimit-overrides.yml.bak config/wfe2-ratelimit-overrides.yml
+    cat config/ratelimit-overrides.yml | tr '\n' '\r' | sed -e "s/\(- CertificatesPerDomain:.*ratelimit.me.*\)\(- CertificatesPerDomain:\)/\2/" | tr '\r' '\n' > config/ratelimit-overrides.yml.bak && mv config/ratelimit-overrides.yml.bak config/ratelimit-overrides.yml
+    cat config/ratelimit-overrides.yml | tr '\n' '\r' | sed -e "s/\(- CertificatesPerDomain:.*ids:\)\(.*\)\(- CertificatesPerFQDNSet:\)/\1\r$REPLACEMENT2\3/" | tr '\r' '\n' > config/ratelimit-overrides.yml.bak && mv config/ratelimit-overrides.yml.bak config/ratelimit-overrides.yml
+    cat config/ratelimit-overrides.yml | tr '\n' '\r' | sed -e "s/\(- CertificatesPerFQDNSet:.*ids:\)\(.*\)/\1\r$REPLACEMENT2/" | tr '\r' '\n' > config/ratelimit-overrides.yml.bak && mv config/ratelimit-overrides.yml.bak config/ratelimit-overrides.yml
 
     perl -i -p0e "s/(\"labcaDomains\": \[\n).*?(\])/\1$LABCA_DOMAINS\n\t\t\2/igs" config/remoteva-a.json
     perl -i -p0e "s/(\"labcaDomains\": \[\n).*?(\])/\1$LABCA_DOMAINS\n\t\t\2/igs" config/remoteva-b.json

@@ -1,5 +1,5 @@
 diff --git a/docker-compose.yml b/docker-compose.yml
-index c0c7fc838..fd9a67f35 100644
+index b3d31f8fb..b720d5921 100644
 --- a/docker-compose.yml
 +++ b/docker-compose.yml
 @@ -4,7 +4,7 @@ services:
@@ -106,7 +106,7 @@ index c0c7fc838..fd9a67f35 100644
      logging:
        driver: "json-file"
        options:
-@@ -144,30 +155,28 @@ services:
+@@ -143,31 +154,29 @@ services:
        - 80:80
        - 443:443
      volumes:
@@ -118,6 +118,7 @@ index c0c7fc838..fd9a67f35 100644
 +      - nginx_html:/var/www/html
      depends_on:
        - control
+     restart: always
  
    control:
 -    image: *boulder_tools_image

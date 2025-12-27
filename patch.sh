@@ -69,7 +69,7 @@ $SUDO patch -p1 < $cloneDir/patches/wfe2_wfe.patch
 
 sed -i -e "s|./test|./labca|" start.py
 
-sed -i -e "s/proxysql:6033/mysql:3306/" sa/db/dbconfig.yml
+sed -i -e "s/proxysql:6033/mysql:3306/" sa/db/dbconfig.mariadb.yml
 
 sed -i -e "s/\(.*overrides.*\)/-- \1/" sa/db-users/boulder_sa.sql
 
