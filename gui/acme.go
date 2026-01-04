@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"html/template"
-	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -46,9 +45,7 @@ type ShowData struct {
 type boulderAccount struct {
 	ID        string
 	Status    string
-	Contact   string
 	Agreement string
-	InitialIP net.IP
 	CreatedAt string
 }
 
@@ -121,9 +118,9 @@ func GetAccounts(w http.ResponseWriter, r *http.Request) (ListData, error) {
 			Accounts.Rows = append(Accounts.Rows, toAnyList(acct))
 		}
 	} else {
-		Accounts.Header = []template.HTML{"ID", "Status", "Contact", "Agreement", "Initial IP", "Created"}
+		Accounts.Header = []template.HTML{"ID", "Status", "Agreement", "Created"}
 
-		rows, err = db.Query("SELECT id, status, contact, agreement, initialIP, createdAt FROM registrations")
+		rows, err = db.Query("SELECT id, status, agreement, createdAt FROM registrations")
 
 		if err != nil {
 			errorHandler(w, r, err, http.StatusInternalServerError)
@@ -132,7 +129,7 @@ func GetAccounts(w http.ResponseWriter, r *http.Request) (ListData, error) {
 
 		for rows.Next() {
 			account := boulderAccount{}
-			err = rows.Scan(&account.ID, &account.Status, &account.Contact, &account.Agreement, &account.InitialIP, &account.CreatedAt)
+			err = rows.Scan(&account.ID, &account.Status, &account.Agreement, &account.CreatedAt)
 			if err != nil {
 				errorHandler(w, r, err, http.StatusInternalServerError)
 				return ListData{}, err
@@ -312,7 +309,7 @@ func GetAccount(w http.ResponseWriter, r *http.Request, id string) (ShowData, er
 			}
 		}
 	} else {
-		rows, err = db.Query("SELECT id, status, contact, agreement, initialIP, createdAt FROM registrations WHERE id=?", id)
+		rows, err = db.Query("SELECT id, status, agreement, createdAt FROM registrations WHERE id=?", id)
 		if err != nil {
 			errorHandler(w, r, err, http.StatusInternalServerError)
 			return ShowData{}, err
@@ -320,16 +317,14 @@ func GetAccount(w http.ResponseWriter, r *http.Request, id string) (ShowData, er
 
 		for rows.Next() {
 			account := boulderAccount{}
-			err = rows.Scan(&account.ID, &account.Status, &account.Contact, &account.Agreement, &account.InitialIP, &account.CreatedAt)
+			err = rows.Scan(&account.ID, &account.Status, &account.Agreement, &account.CreatedAt)
 			if err != nil {
 				errorHandler(w, r, err, http.StatusInternalServerError)
 				return ShowData{}, err
 			}
 			AccountDetails.Rows = append(AccountDetails.Rows, NameValue{"ID", account.ID})
 			AccountDetails.Rows = append(AccountDetails.Rows, NameValue{"Status", account.Status})
-			AccountDetails.Rows = append(AccountDetails.Rows, NameValue{"Contact", account.Contact})
 			AccountDetails.Rows = append(AccountDetails.Rows, NameValue{"Agreement", account.Agreement})
-			AccountDetails.Rows = append(AccountDetails.Rows, NameValue{"Initial IP", account.InitialIP.String()})
 			AccountDetails.Rows = append(AccountDetails.Rows, NameValue{"Created At", account.CreatedAt})
 		}
 	}
