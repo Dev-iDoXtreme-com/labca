@@ -99,21 +99,29 @@ services:
         mysql_upgrade -h bmysql
 
         if mysql -h bmysql -e 'show databases;' | grep -q "boulder_sa_integration"; then
-          mysqldump -h bmysql -R boulder_sa_integration > old-database.sql
-          mysqladmin -h bmysql create boulder_sa
-          mysql -h bmysql boulder_sa < old-database.sql
-          mysql -h bmysql boulder_sa -e 'delete from gorp_migrations;'
-          mysqladmin -h bmysql drop boulder_sa_integration -f
-          rm -rf old-database.sql
+          if mysql -h bmysql -e 'show databases;' | grep -q "boulder_sa "; then
+            echo "database boulder_sa already exists"
+          else
+            mysqldump -h bmysql -R boulder_sa_integration > old-database.sql
+            mysqladmin -h bmysql create boulder_sa
+            mysql -h bmysql boulder_sa < old-database.sql
+            mysql -h bmysql boulder_sa -e 'delete from gorp_migrations;'
+            mysqladmin -h bmysql drop boulder_sa_integration -f
+            rm -rf old-database.sql
+          fi
         fi
 
         if mysql -h bmysql -e 'show databases;' | grep -q "incidents_sa_integration"; then
-          mysqldump -h bmysql -R incidents_sa_integration > old-database.sql
-          mysqladmin -h bmysql create incidents_sa
-          mysql -h bmysql incidents_sa < old-database.sql
-          mysql -h bmysql incidents_sa -e 'delete from gorp_migrations;'
-          mysqladmin -h bmysql drop incidents_sa_integration -f
-          rm -rf old-database.sql
+          if mysql -h bmysql -e 'show databases;' | grep -q "incidents_sa "; then
+            echo "database incidents_sa already exists"
+          else
+            mysqldump -h bmysql -R incidents_sa_integration > old-database.sql
+            mysqladmin -h bmysql create incidents_sa
+            mysql -h bmysql incidents_sa < old-database.sql
+            mysql -h bmysql incidents_sa -e 'delete from gorp_migrations;'
+            mysqladmin -h bmysql drop incidents_sa_integration -f
+            rm -rf old-database.sql
+          fi
         fi
 
   bredis:
@@ -206,6 +214,9 @@ services:
       LABCA_FQDN: ${LABCA_FQDN:-notset}
     working_dir: /opt/labca
     command: ./control.sh
+    depends_on:
+      bmysql-upgrade:
+          condition: service_completed_successfully
     restart: always
 
   bpkimetal:

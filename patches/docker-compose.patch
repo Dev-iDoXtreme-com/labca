@@ -1,5 +1,5 @@
 diff --git a/docker-compose.yml b/docker-compose.yml
-index c5c2c472a..95af47c62 100644
+index 8c2f6e00b..f5761d3ee 100644
 --- a/docker-compose.yml
 +++ b/docker-compose.yml
 @@ -1,3 +1,4 @@
@@ -26,7 +26,7 @@ index c5c2c472a..95af47c62 100644
      networks:
        bouldernet:
          ipv4_address: 10.77.77.77
-@@ -51,109 +54,168 @@ services:
+@@ -51,109 +54,179 @@ services:
        - 4001:4001 # ACMEv2
        - 4003:4003 # SFE
      depends_on:
@@ -120,26 +120,34 @@ index c5c2c472a..95af47c62 100644
 -      bouldernet:
 -        ipv4_address: 10.77.77.4
 +        mysql_upgrade -h bmysql
-+
+ 
+-  bredis_2:
 +        if mysql -h bmysql -e 'show databases;' | grep -q "boulder_sa_integration"; then
-+          mysqldump -h bmysql -R boulder_sa_integration > old-database.sql
-+          mysqladmin -h bmysql create boulder_sa
-+          mysql -h bmysql boulder_sa < old-database.sql
-+          mysql -h bmysql boulder_sa -e 'delete from gorp_migrations;'
-+          mysqladmin -h bmysql drop boulder_sa_integration -f
-+          rm -rf old-database.sql
++          if mysql -h bmysql -e 'show databases;' | grep -q "boulder_sa "; then
++            echo "database boulder_sa already exists"
++          else
++            mysqldump -h bmysql -R boulder_sa_integration > old-database.sql
++            mysqladmin -h bmysql create boulder_sa
++            mysql -h bmysql boulder_sa < old-database.sql
++            mysql -h bmysql boulder_sa -e 'delete from gorp_migrations;'
++            mysqladmin -h bmysql drop boulder_sa_integration -f
++            rm -rf old-database.sql
++          fi
 +        fi
 +
 +        if mysql -h bmysql -e 'show databases;' | grep -q "incidents_sa_integration"; then
-+          mysqldump -h bmysql -R incidents_sa_integration > old-database.sql
-+          mysqladmin -h bmysql create incidents_sa
-+          mysql -h bmysql incidents_sa < old-database.sql
-+          mysql -h bmysql incidents_sa -e 'delete from gorp_migrations;'
-+          mysqladmin -h bmysql drop incidents_sa_integration -f
-+          rm -rf old-database.sql
++          if mysql -h bmysql -e 'show databases;' | grep -q "incidents_sa "; then
++            echo "database incidents_sa already exists"
++          else
++            mysqldump -h bmysql -R incidents_sa_integration > old-database.sql
++            mysqladmin -h bmysql create incidents_sa
++            mysql -h bmysql incidents_sa < old-database.sql
++            mysql -h bmysql incidents_sa -e 'delete from gorp_migrations;'
++            mysqladmin -h bmysql drop incidents_sa_integration -f
++            rm -rf old-database.sql
++          fi
 +        fi
- 
--  bredis_2:
++
 +  bredis:
      image: redis:7.0.15
      volumes:
@@ -248,6 +256,9 @@ index c5c2c472a..95af47c62 100644
 +      LABCA_FQDN: ${LABCA_FQDN:-notset}
 +    working_dir: /opt/labca
 +    command: ./control.sh
++    depends_on:
++      bmysql-upgrade:
++          condition: service_completed_successfully
 +    restart: always
 +
 +  bpkimetal:
