@@ -1230,11 +1230,11 @@ func GetCertificates(w http.ResponseWriter, r *http.Request, forAccount string) 
 		}
 
 		if forAccount == "" {
-			rows, err = db.Query("SELECT c.id, c.registrationID, c.serial, n.reversedName, CASE WHEN cs.notAfter < NOW() THEN CASE WHEN cs.status <> 'good' THEN concat(cs.status, ' / expired') ELSE 'expired' END ELSE cs.status END AS status, c.issued, c.expires FROM certificates c JOIN certificateStatus cs ON cs.id = c.id JOIN issuedNames n ON n.serial = c.serial" + where)
+			rows, err = db.Query("SELECT c.id, c.registrationID, c.serial, n.reversedName, CASE WHEN cs.notAfter < NOW() THEN CASE WHEN cs.status <> 'good' THEN concat(cs.status, ' / expired') ELSE 'expired' END ELSE cs.status END AS status, c.issued, c.expires FROM certificates c JOIN certificateStatus cs ON cs.serial = c.serial JOIN issuedNames n ON n.serial = c.serial" + where)
 		} else if where == "" {
-			rows, err = db.Query("SELECT c.id, c.registrationID, c.serial, n.reversedName, CASE WHEN cs.notAfter < NOW() THEN CASE WHEN cs.status <> 'good' THEN concat(cs.status, ' / expired') ELSE 'expired' END ELSE cs.status END AS status, c.issued, c.expires FROM certificates c JOIN certificateStatus cs ON cs.id = c.id JOIN issuedNames n ON n.serial = c.serial WHERE registrationID=?", forAccount)
+			rows, err = db.Query("SELECT c.id, c.registrationID, c.serial, n.reversedName, CASE WHEN cs.notAfter < NOW() THEN CASE WHEN cs.status <> 'good' THEN concat(cs.status, ' / expired') ELSE 'expired' END ELSE cs.status END AS status, c.issued, c.expires FROM certificates c JOIN certificateStatus cs ON cs.serial = c.serial JOIN issuedNames n ON n.serial = c.serial WHERE registrationID=?", forAccount)
 		} else {
-			rows, err = db.Query("SELECT c.id, c.registrationID, c.serial, n.reversedName, CASE WHEN cs.notAfter < NOW() THEN CASE WHEN cs.status <> 'good' THEN concat(cs.status, ' / expired') ELSE 'expired' END ELSE cs.status END AS status, c.issued, c.expires FROM certificates c JOIN certificateStatus cs ON cs.id = c.id JOIN issuedNames n ON n.serial = c.serial"+where+" AND registrationID=?", forAccount)
+			rows, err = db.Query("SELECT c.id, c.registrationID, c.serial, n.reversedName, CASE WHEN cs.notAfter < NOW() THEN CASE WHEN cs.status <> 'good' THEN concat(cs.status, ' / expired') ELSE 'expired' END ELSE cs.status END AS status, c.issued, c.expires FROM certificates c JOIN certificateStatus cs ON cs.serial = c.serial JOIN issuedNames n ON n.serial = c.serial"+where+" AND registrationID=?", forAccount)
 		}
 		if err != nil {
 			errorHandler(w, r, err, http.StatusInternalServerError)
@@ -1463,7 +1463,7 @@ func GetCertificate(w http.ResponseWriter, r *http.Request, id string, serial st
 			//}
 		}
 	} else {
-		selectWhere := "SELECT c.id, c.registrationID, c.serial, n.reversedName, c.digest, c.issued, c.expires, cs.subscriberApproved, CASE WHEN cs.notAfter < NOW() THEN CASE WHEN cs.status <> 'good' THEN concat(cs.status, ' / expired') ELSE 'expired' END ELSE cs.status END AS status, cs.ocspLastUpdated, cs.revokedDate, cs.revokedReason, cs.lastExpirationNagSent, cs.notAfter, cs.isExpired FROM certificates c JOIN certificateStatus cs ON cs.id = c.id JOIN issuedNames n ON n.serial = c.serial WHERE "
+		selectWhere := "SELECT c.id, c.registrationID, c.serial, n.reversedName, c.digest, c.issued, c.expires, cs.subscriberApproved, CASE WHEN cs.notAfter < NOW() THEN CASE WHEN cs.status <> 'good' THEN concat(cs.status, ' / expired') ELSE 'expired' END ELSE cs.status END AS status, cs.ocspLastUpdated, cs.revokedDate, cs.revokedReason, cs.lastExpirationNagSent, cs.notAfter, cs.isExpired FROM certificates c JOIN certificateStatus cs ON cs.serial = c.serial JOIN issuedNames n ON n.serial = c.serial WHERE "
 
 		if serial != "" {
 			rows, err = db.Query(selectWhere+"c.serial=?", serial)
