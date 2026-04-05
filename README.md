@@ -80,6 +80,9 @@ Once the setup is completed, please make a backup of your Root and Issuer certif
 
 By default, the `latest` LabCA docker image version tags are used when you start it. In case there is a newer version of images available, you can update to the new `:latest` versions by doing something like:
 ```
+cd build
+docker compose down
+git pull
 docker compose pull
 docker compose up -d --remove-orphans
 docker image prune
