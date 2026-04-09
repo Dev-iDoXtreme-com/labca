@@ -3337,15 +3337,6 @@ func init() {
 	dbConn = viper.GetString("db.conn")
 	dbType = viper.GetString("db.type")
 
-	if viper.GetBool("standalone") {
-		version = standaloneVersion
-	} else {
-		version = viper.GetString("version")
-		if version == "" {
-			version = standaloneVersion
-		}
-	}
-
 	webTitle = viper.GetString("labca.web_title")
 	if webTitle == "" {
 		webTitle = "LabCA"
@@ -3363,8 +3354,14 @@ func init() {
 
 	updateAvailable = false
 
-	if !viper.GetBool("standalone") {
+	if viper.GetBool("standalone") {
+		version = standaloneVersion
+	} else {
 		CheckUpgrades()
+		version = viper.GetString("version")
+		if version == "" {
+			version = standaloneVersion
+		}
 	}
 
 	/*
