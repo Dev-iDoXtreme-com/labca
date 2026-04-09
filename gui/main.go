@@ -3145,7 +3145,7 @@ func authorized(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println(r.Method + " " + r.RequestURI)
 
-		if r.RequestURI == "/login" || strings.Contains(r.RequestURI, "/static/") {
+		if r.RequestURI == "/login" || strings.HasPrefix(r.RequestURI, "/static/") {
 			next.ServeHTTP(w, r)
 		} else {
 			session, _ := sessionStore.Get(r, "labca")
